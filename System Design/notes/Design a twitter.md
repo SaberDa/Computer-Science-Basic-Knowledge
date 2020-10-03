@@ -386,3 +386,52 @@ How to scale? 系统如何优化与维护？
 
 
 
+### Scale 扩展 - 如何实现 Follow & Unfollow?
+
+- 如何实现 Follow & Unfollow
+    - Follow 一个用户之后，异步地将他的 Timeline 合并到你的 News Feed中
+        - Merge timeline into news feed asynchronously
+    - Unfollow 一个用户之后，异步地将他的 Tweets 从你的 News Feed 删除
+        - Pick out tweets from news feed asynchronously
+- 为什么需要异步 Async？
+    - 因为这个过程不快
+- 异步的好处
+    - 用户迅速得到反馈，似乎马上就 follow/ unfollow 成功了
+- 异步的坏处
+    - Unfollow 之后立即刷新 News Feed，还能发现他的信息
+    - 最终还是会被删除掉
+
+
+### Scale 扩展 - 如何存储 Likes
+
+![](https://raw.githubusercontent.com/SaberDa/Computer-Science-Basic-Knowledge/master/System%20Design/notes/pic/like-table.png)
+
+### Scale 扩展 - 惊群效应 Thundering Herd
+
+- 数据库承受不住压力
+    - 对于同一条数据短时间出现大量的请求
+        - 因为是同一条数据，所以什么 load balancer, sharding, consistent hashing 都不管用
+- 解决方案：那我加上Cache？
+    - 真的有那么容易？
+- Follow up:
+    - 点赞、转发、评论，都会修改这条 Tweet 的基本信息，如何更新？
+        - Keywords: Write through, Write back, Look aside
+- Follow up:
+    - Cache 失效怎么办？
+        - 因为内存不够或者 Cache 决策错误，热点信息被提出了 Cache，会发生什么？
+            - DB 会瞬间收到一大波对该数据请求，然后挂了
+    - 解决方案：
+        - Facebook Lease Get
+        - http://bit.ly/1jDzKZK
+
+# Design Twitter - 总结
+
+- 需求分析 Scenario
+- 服务图谱 Service Graph
+- 表单设计 Schema Design
+- Push vs Pull
+    - 明星问题
+    - 不活跃用户问题 Inactive users
+- Follow & Unfollow
+- 标准化与非标准化 Normalize vs De-normalized
+- 热点问题 Hot Spot/ Thundering Herd
